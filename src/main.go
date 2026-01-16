@@ -6,10 +6,14 @@ import (
 )
 
 func main() {
+	startBackend(9001, "temp1")
+	startBackend(9002, "temp2")
+	startBackend(9003, "temp3")
+
 	servers := []Server{
-		newSimpleServer("https://www.youtube.com/"),
-		newSimpleServer("https://www.bing.com/"),
-		newSimpleServer("https://www.google.com/"),
+		newSimpleServer("http://localhost:9001"),
+		newSimpleServer("http://localhost:9002"),
+		newSimpleServer("http://localhost:9003"),
 	}
 
 	loadbalancer := NewLoadBalancer("8000", servers)
