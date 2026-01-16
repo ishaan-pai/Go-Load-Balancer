@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -11,12 +12,13 @@ func main() {
 	startBackend(9003, "temp3")
 
 	servers := []Server{
-		newSimpleServer("http://localhost:9001"),
-		newSimpleServer("http://localhost:9002"),
-		newSimpleServer("http://localhost:9003"),
+		newSimpleServer("http://localhost:9001", true),
+		newSimpleServer("http://localhost:9002", true),
+		newSimpleServer("http://localhost:9003", true),
 	}
 
 	loadbalancer := NewLoadBalancer("8000", servers)
+	loadbalancer.startHealthCheckLoop(2 * time.Second)
 
 	handleRedirect := func(rw http.ResponseWriter, req *http.Request) {
 		loadbalancer.serveProxy(rw, req)

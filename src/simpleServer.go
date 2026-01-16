@@ -14,12 +14,13 @@ type simpleServer struct {
 	aliveState bool
 }
 
-func newSimpleServer(addr string) *simpleServer {
+func newSimpleServer(addr string, aliveState bool) *simpleServer {
 	serverUrl, err := url.Parse(addr)
 	handleErr(err)
 	return &simpleServer{
-		addr:  addr,
-		proxy: httputil.NewSingleHostReverseProxy(serverUrl),
+		addr:       addr,
+		proxy:      httputil.NewSingleHostReverseProxy(serverUrl),
+		aliveState: aliveState,
 	}
 }
 
