@@ -15,3 +15,6 @@ jobs:
       
       - run: go build ./...
         working-directory: src
+      
+      - run: go test ./...
+        working-directory: src
