@@ -41,4 +41,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr .io/ishaan-pai/go-load-balancer:latest
+          tags: ghcr.io/ishaan-pai/go-load-balancer:latest
