@@ -27,7 +27,7 @@ func (loadbalancer *LoadBalancer) getNextAvailableServer() Server {
 	for i := 0; i < temp; i++ {
 		server := loadbalancer.servers[loadbalancer.roundRobinCount%temp]
 		loadbalancer.roundRobinCount++
-		if server.isAlive() {
+		if !server.isAlive() {
 			return server
 		}
 	}
