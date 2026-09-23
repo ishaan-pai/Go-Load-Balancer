@@ -74,6 +74,3 @@ These are known gaps, left in because the project is scoped as a proof of concep
 - Backend addresses, ports, and the health-check interval are hardcoded in `main.go` rather than read from config.
 - Backends are only marked dead by the periodic health check. A request that fails mid-proxy isn't retried on another backend and doesn't mark that backend down.
 - Plain round robin only; no weighting, least-connections, or sticky sessions.
-## License
- 
-MIT
