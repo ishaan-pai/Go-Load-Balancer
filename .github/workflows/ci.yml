@@ -12,13 +12,19 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22'
-      
+
+      - run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+        working-directory: src
+
+      - run: go vet ./...
+        working-directory: src
+
       - run: go build ./...
         working-directory: src
-      
-      - run: go test ./...
+
+      - run: go test -race ./...
         working-directory: src
-  
+
   docker:
     needs: build
     if: github.ref == 'refs/heads/main'
@@ -27,7 +33,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +42,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - uses: docker/build-push-action@v6
         with:
           context: .

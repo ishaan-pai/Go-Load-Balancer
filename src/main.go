@@ -1,31 +1,38 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
-	"time"
+	"os"
 )
 
 func main() {
-	startBackend(9001, "temp1")
-	startBackend(9002, "temp2")
-	startBackend(9003, "temp3")
-
-	servers := []Server{
-		newSimpleServer("http://localhost:9001", true),
-		newSimpleServer("http://localhost:9002", true),
-		newSimpleServer("http://localhost:9003", true),
+	cfg, err := loadConfig(os.Getenv)
+	if err != nil {
+		log.Fatalf("invalid config: %v", err)
 	}
 
-	loadbalancer := NewLoadBalancer("8000", servers)
-	loadbalancer.startHealthCheckLoop(2 * time.Second)
-
-	handleRedirect := func(rw http.ResponseWriter, req *http.Request) {
-		loadbalancer.serveProxy(rw, req)
+	if cfg.Demo {
+		log.Printf("LB_BACKENDS not set, starting built-in demo backends")
+		startBackend(9001, "temp1")
+		startBackend(9002, "temp2")
+		startBackend(9003, "temp3")
 	}
 
-	http.HandleFunc("/", handleRedirect)
+	servers := make([]Server, 0, len(cfg.Backends))
+	for _, addr := range cfg.Backends {
+		s, err := newSimpleServer(addr, true)
+		if err != nil {
+			log.Fatalf("creating backend: %v", err)
+		}
+		servers = append(servers, s)
+	}
 
-	fmt.Printf("serving requests at 'localhost:%s'\n", loadbalancer.port)
-	http.ListenAndServe(":"+loadbalancer.port, nil)
+	loadbalancer := NewLoadBalancer(cfg.Port, servers)
+	loadbalancer.startHealthCheckLoop(cfg.HealthInterval, cfg.HealthTimeout)
+
+	http.HandleFunc("/", loadbalancer.serveProxy)
+
+	log.Printf("serving requests at 'localhost:%s' across %d backends", cfg.Port, len(servers))
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, nil))
 }
