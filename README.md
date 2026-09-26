@@ -2,7 +2,9 @@
  
 A round-robin HTTP load balancer written in Go using only the standard library. It proxies incoming requests across a pool of backends, runs periodic health checks, skips any backend that fails one, and retries a failed request on the next backend.
  
-This is a learning project, not a production load balancer. The goal was to build the core mechanics behind something like an AWS ALB (request distribution, health checking, reverse proxying) from scratch and see how they fit together.
+This is a learning project, not a production load balancer. The goal was to build the core mechanics behind something like an AWS ALB (request distribution, health checking, reverse proxying) from scratch and see how they fit together to avoid simply treating it as a black box. 
+
+This project has now been hosted on an AWS EC2 instance. (tested and successfully working using curl http://35.182.240.101:8000/foo)
  
 ## How it works
  
@@ -35,6 +37,7 @@ client ──▶ :8000 load balancer ──▶ :9001 temp1
 | `src/simpleServer.go` | `Server` implementation backed by `httputil.NewSingleHostReverseProxy`. Reports connection failures back to the balancer instead of answering with a 502 itself. |
 | `src/backends.go` | The local test backends used for demoing. |
 | `Dockerfile` | Builds and runs the balancer in a `golang:1.22-alpine` image. |
+| `.github` | Sets up CI/CD pipeline workflows |
  
 ## Running it
  
